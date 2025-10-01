@@ -3,10 +3,14 @@
  */
 
 #include <libc.h>
-
 #include <types.h>
 
 int errno;
+
+void perror(void)
+{
+  printk("%d\n",errno);
+}
 
 void itoa(int a, char *b)
 {
