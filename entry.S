@@ -5,6 +5,7 @@
 #include <asm.h>
 #include <segment.h>
 #incldue <keyboard.h>
+#include <sys_call_table.h>
 
 /**************************************************/
 /**** Save & Restore ******************************/

@@ -4,6 +4,7 @@
 
 #include <libc.h>
 #include <types.h>
+#include <io.h>
 
 int errno;
 
