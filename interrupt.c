@@ -7,6 +7,7 @@
 #include <hardware.h>
 #include <io.h>
 #include <keyboard.h>
+#include <syscall.h>
 
 #include <zeos_interrupt.h>
 
@@ -77,8 +78,8 @@ void setTrapHandler(int vector, void (*handler)(), int maxAccessibleFromPL)
 void keyboard_service()
 {
   unsigned char c, scancode;
-  byte x=0;
-  byte y=0;
+  Byte x=0;
+  Byte y=0;
   while((c=inb(0x60)) && (c & 0x80))
   {
       scancode = c & 0x7F;
@@ -86,7 +87,7 @@ void keyboard_service()
          c = char_map[scancode];
       else
          c = 'C';
-      print_xy(x, y, c);
+      printc_xy(x, y, c);
   }
 }
 

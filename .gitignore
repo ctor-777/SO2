@@ -1,2 +1,13 @@
 
 .DS_Store
+
+
+*.o
+*.out
+
+*.bin
+
+bootsect
+user
+system
+build

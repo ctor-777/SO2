@@ -5,7 +5,7 @@
 #include <asm.h>
 #include <segment.h>
 #incldue <keyboard.h>
-#include <sys_call_table.h>
+//#include <sys_call_table.h>
 
 /**************************************************/
 /**** Save & Restore ******************************/
@@ -62,12 +62,12 @@
       popl %eax; \
       popl %ds; \
       popl %es; \
-      popl %fs; \                                                      
+      popl %fs; \
       popl %gs; 
 
 #define EOI \
-      movb $0x20, %al ; \
-      outb %al, $0x20 ;
+      movb $0x20, %al; \
+      outb %al, $0x20;
 
 
 ENTRY(keyboard_handler)
@@ -87,7 +87,7 @@ ENTRY(system_call_handler)
 	call *sys_call_table(, %EAX, 0x04) // Call the corresponding service routine
 	jmp fin // Finish
 err:
-	movl $-ENOSYS, %EAX // Move to EAX the ENOSYS error
+	//movl $-ENOSYS, %EAX // Move to EAX the ENOSYS error
 fin:
 	movl %EAX, 0x18(%esp) // Change the EAX value in the stack
 	RESTORE_ALL // Restore the context
