@@ -13,6 +13,8 @@
 
 #include <sched.h>
 
+#include <sys.h>
+
 #define LECTURA 0
 #define ESCRIPTURA 1
 

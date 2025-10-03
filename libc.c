@@ -10,7 +10,7 @@ int errno;
 
 void perror(void)
 {
-  // printk("%d\n",errno);
+  printk("%d\n",errno);
 }
 
 void itoa(int a, char *b)

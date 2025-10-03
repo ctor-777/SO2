@@ -7,7 +7,3 @@
 
 *.bin
 
-bootsect
-user
-system
-build
