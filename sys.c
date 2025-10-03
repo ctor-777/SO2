@@ -34,8 +34,8 @@ int sys_write(int fd, char * buffer, int size)
 {
   int valor=check_fd(fd, ESCRIPTURA);
   if(valor==0)
-    if(buffer==NULL)
-      if(size<0)
+    if(buffer!=NULL)
+      if(size>0)
         valor=sys_write_console(buffer, size);
   return valor;
 }
