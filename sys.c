@@ -15,6 +15,8 @@
 
 #include <sys.h>
 
+#include <interrupt.h>
+
 #define LECTURA 0
 #define ESCRIPTURA 1
 
@@ -38,6 +40,10 @@ int sys_write(int fd, char * buffer, int size)
       if(size>0)
         valor=sys_write_console(buffer, size);
   return valor;
+}
+
+int sys_gettime() {
+	return zeos_ticks;
 }
 
 int sys_getpid()

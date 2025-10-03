@@ -19,3 +19,8 @@
  movl $-1, %eax
 exit:
  ret
+
+.globl gettime; .type gettime, @function; .align 0; gettime:
+ movl $10, %eax
+ int $0x80
+ ret

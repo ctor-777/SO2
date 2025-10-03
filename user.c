@@ -12,8 +12,11 @@ int __attribute__ ((__section__(".text.main")))
 
     
   while(1) { 
-
-		write(1, "hello", 5);
+		while (1000){}
+		int i = gettime();
+		char time[15];
+		 itoa(i, time);
+		write(1,time , strlen(time));
 
 	}
 }

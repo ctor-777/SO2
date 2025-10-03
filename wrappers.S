@@ -12,3 +12,8 @@ ENTRY(write)
 	movl $-1, %eax
 exit:
 	ret
+
+ENTRY(gettime)
+	movl $10, %eax		//sys_call_table entry for gettime is 10
+	int $0x80
+	ret

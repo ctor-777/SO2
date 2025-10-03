@@ -90,25 +90,10 @@ void keyboard_service()
 	}
 }
 
-int time = 0;
-
-// void zeos_show_clock() {
-// 	char min[2];
-// 	char hour[2];
-//
-// 	itoa(time%60, min);
-// 	itoa((time/60)%100, hour);
-//
-// 	printc_xy(0, 0, hour[1]);
-// 	printc_xy(1, 0, hour[0]);
-// 	printc_xy(2, 0, ':');
-// 	printc_xy(3, 0, min[1]);
-// 	printc_xy(4, 0, min[0]);
-// }
+int zeos_ticks = 0;
 
 void clock_service() {
-
-	time++;
+	zeos_ticks++;
 	zeos_show_clock();
 }
 
