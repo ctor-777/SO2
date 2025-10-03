@@ -5,7 +5,8 @@
 #include <asm.h>
 #include <segment.h>
 #incldue <keyboard.h>
-//#include <sys_call_table.h>
+#incldue <clock.h>
+//#include <sys_call_table.S>
 
 /**************************************************/
 /**** Save & Restore ******************************/
@@ -87,9 +88,16 @@ ENTRY(system_call_handler)
 	call *sys_call_table(, %EAX, 0x04) // Call the corresponding service routine
 	jmp fin // Finish
 err:
-	//movl $-ENOSYS, %EAX // Move to EAX the ENOSYS error
+	//movl $-ENOSYS, %EAX // Move to EAX the ENOSYS error //TODO: compiler couldn't find ENOSYS 
 fin:
 	movl %EAX, 0x18(%esp) // Change the EAX value in the stack
 	RESTORE_ALL // Restore the context
 	iret
 
+
+ENTRY(clock_handler)
+	SAVE_ALL
+	EOI
+	call clock_service
+	RESTORE_ALL
+	iret

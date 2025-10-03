@@ -7,6 +7,7 @@
 #include <hardware.h>
 #include <io.h>
 #include <keyboard.h>
+#include <clock.h>
 #include <syscall.h>
 
 #include <zeos_interrupt.h>
@@ -86,8 +87,32 @@ void keyboard_service()
          c = char_map[scancode];
       else
          c = 'C';
-      printc_xy(x, y, c);
+      // printc_xy(x, y, c);
+
+	printc(c);
 	}
+}
+
+int time = 0;
+
+// void zeos_show_clock() {
+// 	char min[2];
+// 	char hour[2];
+//
+// 	itoa(time%60, min);
+// 	itoa((time/60)%100, hour);
+//
+// 	printc_xy(0, 0, hour[1]);
+// 	printc_xy(1, 0, hour[0]);
+// 	printc_xy(2, 0, ':');
+// 	printc_xy(3, 0, min[1]);
+// 	printc_xy(4, 0, min[0]);
+// }
+
+void clock_service() {
+
+	time++;
+	zeos_show_clock();
 }
 
 void setIdt()
@@ -100,6 +125,7 @@ void setIdt()
 
   /* ADD INITIALIZATION CODE FOR INTERRUPT VECTOR */
   setInterruptHandler(33, keyboard_handler, 0);
+  setInterruptHandler(32, clock_handler, 0);
   setTrapHandler(0x80, system_call_handler, 3);
   set_idt_reg(&idtR);
 }
