@@ -79,17 +79,14 @@ void setTrapHandler(int vector, void (*handler)(), int maxAccessibleFromPL)
 void keyboard_service()
 {
   unsigned char c, scancode;
-  Byte x=0;
-  Byte y=0;
   if ((c=inb(0x60)) && (c & 0x80)) {
       scancode = c & 0x7F;
       if(scancode < sizeof(char_map))				// Si es '\0' tambien se escribira 'C'
          c = char_map[scancode];
       else
          c = 'C';
-      // printc_xy(x, y, c);
 
-	printc(c);
+		printc_xy(0, 0, c);
 	}
 }
 
