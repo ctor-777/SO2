@@ -8,6 +8,7 @@ ENTRY(write)
 	int $0x80
 	cmpl $0, %eax
 	jge exit
+	neg %eax
 	movl %eax, errno
 	movl $-1, %eax
 exit:

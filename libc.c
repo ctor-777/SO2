@@ -6,11 +6,13 @@
 #include <types.h>
 #include <io.h>
 
-int errno;
+// int errno;
 
 void perror(void)
 {
-  //printk("%d\n",errno);
+	char buff[10];
+	itoa(errno, buff);
+	write(1, buff, strlen(buff));
 }
 
 void itoa(int a, char *b)

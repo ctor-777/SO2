@@ -33,8 +33,6 @@ int sys_ni_syscall()
 	return -38; /*ENOSYS*/
 }
 
-// #define WRITE_BUFFER_SIZE 4
-
 int sys_write(int fd, char * buffer, int size)
 {
 	char buff[size];
@@ -42,22 +40,14 @@ int sys_write(int fd, char * buffer, int size)
 	int valor=check_fd(fd, ESCRIPTURA);
 	if (valor != 0)
 		return valor;
+
+	if (size <= 0 || buffer == NULL)
+		return -22; //EINVAL
 	
-	if (!access_ok(VERIFY_READ, buffer, size)) {
-		sys_write_console("access not ok\n", 14);
-		return -1; //TODO appropiate error
-	}
+	if (!access_ok(VERIFY_READ, buffer, size)) 
+		return -13; //EFAULT
 
-	if (buffer == NULL || size <= 0)
-		return valor;
 
-	// valor = 0;
-	// while (size > WRITE_BUFFER_SIZE) {
-	// 	copy_from_user(buffer, buff, WRITE_BUFFER_SIZE);
-	// 	valor += sys_write_console(buff, WRITE_BUFFER_SIZE);
-	// 	buffer += WRITE_BUFFER_SIZE;
-	// 	size -= WRITE_BUFFER_SIZE;
-	// }
 	copy_from_user(buffer, buff, size);
 	valor=sys_write_console(buff, size);
 

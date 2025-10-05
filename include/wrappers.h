@@ -7,3 +7,4 @@ int write (int fd, char * buffer, int size);
 int gettime();
 
 #endif /* __WRAPPERS_H__ */
+

@@ -1,5 +1,6 @@
 #include <libc.h>
 #include <wrappers.h>
+#include <errno.h>
 
 char buff[24];
 
@@ -16,9 +17,16 @@ int __attribute__ ((__section__(".text.main")))
 	buff [1] = 0;
     
 	while(1) { 
-		itoa(15, buff);
-		write(1, "itoa fine: \n", 12);
-		write(1, buff , 1);
-		write(1, "a", 1);
+		// i = write(1, "\nwrite: ", 8);
+		// itoa(i, buff);
+		// write(1, buff , strlen(buff));
+
+		// i = write(1, "hello", 5);
+		i = failed_syscall();
+		if (i < 0) {
+			write(1, "\nError: ", 7);
+			
+			perror();
+		}
 	}
 }

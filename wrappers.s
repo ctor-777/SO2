@@ -16,6 +16,7 @@
  int $0x80
  cmpl $0, %eax
  jge exit
+ neg %eax
  movl %eax, errno
  movl $-1, %eax
 exit:
@@ -24,4 +25,12 @@ exit:
 .globl gettime; .type gettime, @function; .align 0; gettime:
  movl $10, %eax
  int $0x80
+ ret
+
+.globl failed_syscall; .type failed_syscall, @function; .align 0; failed_syscall:
+ movl $100, %eax
+ int $0x80
+ neg %eax
+ movl %eax, errno
+ movl $-1, %eax
  ret
