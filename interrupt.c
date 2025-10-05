@@ -9,6 +9,8 @@
 #include <keyboard.h>
 #include <clock.h>
 #include <syscall.h>
+#include <page_fault.h>
+#include <libc.h>
 
 #include <zeos_interrupt.h>
 
@@ -97,6 +99,16 @@ void clock_service() {
 	zeos_show_clock();
 }
 
+
+void segmentation_fault_service(unsigned int eip)
+{
+  char buff[8];
+  itoa(eip, buff);
+  printk("Process generates a PAGE FAULT exception at EIP: ");
+  printk(buff);
+  while (1);
+}
+
 void setIdt()
 {
   /* Program interrups/exception service routines */
@@ -108,6 +120,7 @@ void setIdt()
   /* ADD INITIALIZATION CODE FOR INTERRUPT VECTOR */
   setInterruptHandler(33, keyboard_handler, 0);
   setInterruptHandler(32, clock_handler, 0);
+  setInterruptHandler(0x0E, segmentation_fault_handler, 0);
   setTrapHandler(0x80, system_call_handler, 3);
   set_idt_reg(&idtR);
 }

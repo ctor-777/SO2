@@ -5,5 +5,4 @@ void clock_handler();
 
 void clock_service();
 
-
 #endif /* __CLOCK_H__ */

@@ -100,3 +100,12 @@ ENTRY(clock_handler)
 	call clock_service
 	RESTORE_ALL
 	iret
+	
+ENTRY(segmentation_fault_handler)
+        SAVE_ALL
+        movl 48(%esp), %eax
+        pushl %eax
+        call segmentation_fault_service
+        add   $4, %esp
+        RESTORE_ALL
+        iret

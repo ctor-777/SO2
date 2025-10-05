@@ -21,8 +21,10 @@ int __attribute__ ((__section__(".text.main")))
 		// itoa(i, buff);
 		// write(1, buff , strlen(buff));
 
-		// i = write(1, "hello", 5);
-		i = failed_syscall();
+		char *p = 0;
+		*p = 'c';
+
+		i = write(1, "hello", 5);
 		if (i < 0) {
 			write(1, "\nError: ", 7);
 			
