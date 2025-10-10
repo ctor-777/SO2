@@ -3,8 +3,12 @@
  */
 
 #include <sched.h>
+#include <list.h>
 #include <mm.h>
 #include <io.h>
+
+struct list_head readyq;
+struct list_head freeq;
 
 union task_union task[NR_TASKS]
   __attribute__((__section__(".data.task")));
@@ -60,11 +64,35 @@ void init_idle (void)
 
 void init_task1(void)
 {
+
+	struct list_head* init = list_first(&freeq);
+	list_del(init);
+	struct task_struct* init_task =  list_entry(init, struct task_struct, anchor);
+
+	init_task->PID = 1;
+
+	allocate_DIR(init_task);
+	set_user_pages(init_task);
+
+	
+
+	set_cr3(get_DIR(init_task));
+
+	list_add_tail(init, &readyq);
 }
 
 
 void init_sched()
 {
+
+    INIT_LIST_HEAD( &readyq );
+    INIT_LIST_HEAD( &freeq );
+
+
+	for(int i = 0; i < NR_TASKS; i++) {
+		list_add_tail(&(task[i].task.anchor), &freeq);
+	}
+
 
 }
 
