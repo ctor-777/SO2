@@ -6,7 +6,7 @@
 #include <types.h>
 #include <io.h>
 
-// int errno;
+int errno;
 
 void perror(void)
 {

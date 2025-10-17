@@ -84,7 +84,7 @@ int __attribute__((__section__(".text.main")))
   init_mm();
 
   /* Initialize an address space to be used for the monoprocess version of ZeOS */
-  monoprocess_init_addr_space(); /* TO BE DELETED WHEN THE PROCESS MANAGEMENT CODE TO BECOME MULTIPROCESS IS ADDED */
+  //monoprocess_init_addr_space(); /* TO BE DELETED WHEN THE PROCESS MANAGEMENT CODE TO BECOME MULTIPROCESS IS ADDED */
 
   /* Initialize Scheduling */
   init_sched();
@@ -92,10 +92,15 @@ int __attribute__((__section__(".text.main")))
   /* Initialize idle task  data */
   init_idle();
   /* Initialize task 1 data */
-  init_task1();
+  //init_task1();
 
   /* Move user code/data now (after the page table initialization) */
-  copy_data((void *) KERNEL_START + *p_sys_size, (void*)L_USER_START, *p_usr_size);
+  //copy_data((void *) KERNEL_START + *p_sys_size, (void*)L_USER_START, *p_usr_size);
+
+  printk("Entering idle mode...");
+
+	__asm__ volatile ("movl %0, %%esp" :: "r"(&(task[0].stack[KERNEL_STACK_SIZE-2])));
+	__asm__ volatile ("ret") ;
 
 
   printk("Entering user mode...");

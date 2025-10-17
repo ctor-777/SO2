@@ -22,6 +22,4 @@ int fork();
 
 void exit();
 
-int errno;
-
 #endif  /* __LIBC_H__ */

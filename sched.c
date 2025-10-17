@@ -60,6 +60,23 @@ void cpu_idle(void)
 void init_idle (void)
 {
 
+	struct list_head* idle = list_first(&freeq);
+	list_del(idle);
+	struct task_struct* idle_task =  list_entry(idle, struct task_struct, anchor);
+
+	idle_task->PID = 0;
+
+	allocate_DIR(idle_task);
+
+	union task_union* idle_union = (union task_union*) &idle_task;
+
+	idle_union->stack[KERNEL_STACK_SIZE-1] = (unsigned int)&cpu_idle;
+	idle_union->stack[KERNEL_STACK_SIZE-2] =  0;
+
+
+	set_cr3(get_DIR(idle_task));
+
+	list_add_tail(idle, &readyq);
 }
 
 void init_task1(void)
@@ -89,6 +106,7 @@ void init_sched()
     INIT_LIST_HEAD( &freeq );
 
 
+	//fill free queue with all procesess
 	for(int i = 0; i < NR_TASKS; i++) {
 		list_add_tail(&(task[i].task.anchor), &freeq);
 	}
