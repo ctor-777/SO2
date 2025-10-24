@@ -102,10 +102,32 @@ ENTRY(clock_handler)
 	iret
 	
 ENTRY(segmentation_fault_handler)
-        SAVE_ALL
-        movl 48(%esp), %eax
-        pushl %eax
-        call segmentation_fault_service
-        add   $4, %esp
-        RESTORE_ALL
-        iret
+	SAVE_ALL
+	movl 48(%esp), %eax
+	pushl %eax
+	call segmentation_fault_service
+	add   $4, %esp
+	RESTORE_ALL
+	iret
+
+ENTRY(task_switch)
+	pushl %edi; \
+	pushl %esi; \
+	pushl %ebx; \
+
+	//move parameter to top of stack
+	pushl 8(%ebp)
+
+	call inner_task_switch
+
+	//discard parameter
+	popl %ebx;
+
+	popl %ebx; \
+	popl %esi; \
+	popl %edi; \
+	ret
+
+ENTRY(ebp_value)
+	movl %eax, %ebp
+	ret

@@ -49,6 +49,7 @@ int allocate_DIR(struct task_struct *t)
 
 void cpu_idle(void)
 {
+	printk("\nin idle...");
 	__asm__ __volatile__("sti": : :"memory");
 
 	while(1)
@@ -91,7 +92,6 @@ void init_task1(void)
 	allocate_DIR(init_task);
 	set_user_pages(init_task);
 
-	
 
 	set_cr3(get_DIR(init_task));
 
@@ -111,7 +111,6 @@ void init_sched()
 		list_add_tail(&(task[i].task.anchor), &freeq);
 	}
 
-
 }
 
 struct task_struct* current()
@@ -125,3 +124,23 @@ struct task_struct* current()
   return (struct task_struct*)(ret_value&0xfffff000);
 }
 
+void scheduler() {
+}
+
+void inner_task_switch(union task_union *t) {
+	
+	set_cr3(get_DIR(t));
+
+	change_TSS_EBP(t);
+
+	current()->kernel_esp = ebp_value();
+
+	void* tmp = (void*)t->task.kernel_esp;
+	__asm__ __volatile__(
+		"movl %0, %%esp"
+		:
+		: "r" (tmp)
+		: "memory"
+	);
+	
+}

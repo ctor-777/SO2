@@ -1,6 +1,7 @@
 /*
  * interrupt.c -
  */
+#include "sched.h"
 #include <types.h>
 #include <interrupt.h>
 #include <segment.h>
@@ -80,16 +81,35 @@ void setTrapHandler(int vector, void (*handler)(), int maxAccessibleFromPL)
 
 void keyboard_service()
 {
-  unsigned char c, scancode;
-  if ((c=inb(0x60)) && (c & 0x80)) {
-      scancode = c & 0x7F;
-      if(scancode < sizeof(char_map))				// Si es '\0' tambien se escribira 'C'
-         c = char_map[scancode];
-      else
-         c = 'C';
+	printk("\nin keyboard...");
+	unsigned char c, scancode;
+	if ((c=inb(0x60)) && (c & 0x80)) {
+		scancode = c & 0x7F;
+		if(scancode < sizeof(char_map))				// Si es '\0' tambien se escribira 'C'
+			c = char_map[scancode];
+		else
+			c = 'C';
+
+		//task switch testing
+		//
+		char buff[16];
+		if(char_map[scancode] == 'd') {
+			printk("\nswitching to idle...");
+			itoa((&(task[0]))->task.PID, buff);
+			printk(buff);
+			task_switch(&(task[0]));
+		} 
+		if (char_map[scancode] == 'n') {
+			printk("\nswitching to init...");
+			itoa((&(task[1]))->task.PID, buff);
+			printk(buff);
+			task_switch(&(task[1]));
+		}
 
 		printc_xy(0, 0, c);
 	}
+
+	
 }
 
 int zeos_ticks = 0;

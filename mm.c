@@ -7,6 +7,7 @@
 #include <segment.h>
 #include <hardware.h>
 #include <sched.h>
+#include <io.h>
 
 Byte phys_mem[TOTAL_PAGES];
 
@@ -133,8 +134,8 @@ void init_mm()
   init_table_pages();
   init_frames();
   init_dir_pages();
-  // allocate_DIR(&task[0].task);
-  // set_cr3(get_DIR(&task[0].task));
+  allocate_DIR(&task[0].task);
+  set_cr3(get_DIR(&task[0].task));
   set_pe_flag();
 }
 /***********************************************/
@@ -189,6 +190,12 @@ void setTSS()
   set_task_reg(KERNEL_TSS);
 }
 
+void change_TSS_EBP(union task_union *t)
+{
+  tss.esp0               = (Word)t->task.kernel_esp;
+
+  set_task_reg(KERNEL_TSS);
+}
  
 /* Initializes the ByteMap of free physical pages.
  * The kernel pages are marked as used */
