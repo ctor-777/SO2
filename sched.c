@@ -9,6 +9,7 @@
 
 struct list_head readyq;
 struct list_head freeq;
+struct task_struct* idle_task
 
 union task_union task[NR_TASKS]
   __attribute__((__section__(".data.task")));
@@ -58,12 +59,13 @@ void cpu_idle(void)
 	}
 }
 
+
 void init_idle (void)
 {
 
 	struct list_head* idle = list_first(&freeq);
 	list_del(idle);
-	struct task_struct* idle_task =  list_entry(idle, struct task_struct, anchor);
+	idle_task =  list_entry(idle, struct task_struct, anchor);
 
 	idle_task->PID = 0;
 
@@ -76,8 +78,6 @@ void init_idle (void)
 
 
 	set_cr3(get_DIR(idle_task));
-
-	list_add_tail(idle, &readyq);
 }
 
 void init_task1(void)
