@@ -5,6 +5,6 @@
 
 void segmentation_fault_handler();
 
-void segmentation_fault_service();
+void segmentation_fault_service(unsigned int eip, unsigned int err);
 
 #endif
