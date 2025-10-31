@@ -122,22 +122,24 @@ void clock_service() {
 
 void segmentation_fault_service(unsigned int eip, unsigned int err)
 {
-  char buff[8];
+	char buff[8];
 
 	int fault_addr;
 	__asm__ __volatile__("mov %%cr2, %0" : "=r" (fault_addr));
 
-  itoa(eip, buff);
-  printk("\nProcess generates a ");
+	printk("\nProcess generates a ");
 
-	if (err == )
+	//err handling
 
 	printk("PAGE FAULT exception at EIP: ");
-  printk(buff);
+	itoa(eip, buff);
+	printk(buff);
+
 	printk("   accessing: ");
 	itoa(fault_addr, buff);
-  printk(buff);
-  while (1);
+	printk(buff);
+
+	while (1);
 }
 
 void setIdt()
