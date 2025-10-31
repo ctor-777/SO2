@@ -111,6 +111,9 @@ ENTRY(segmentation_fault_handler)
 	iret
 
 ENTRY(task_switch)
+	pushl %ebp; 
+	movl %esp,%ebp;
+
 	pushl %edi; \
 	pushl %esi; \
 	pushl %ebx; \
@@ -126,6 +129,9 @@ ENTRY(task_switch)
 	popl %ebx; \
 	popl %esi; \
 	popl %edi; \
+
+	movl %esp, %ebp; //should be redundant
+	popl %ebp;
 	ret
 
 ENTRY(ebp_value)

@@ -9,7 +9,7 @@
 
 struct list_head readyq;
 struct list_head freeq;
-struct task_struct* idle_task
+struct task_struct* idle_task;
 
 union task_union task[NR_TASKS]
   __attribute__((__section__(".data.task")));
@@ -129,7 +129,7 @@ void scheduler() {
 
 void inner_task_switch(union task_union *t) {
 	
-	set_cr3(get_DIR(t));
+	set_cr3(get_DIR(&(t->task)));
 
 	change_TSS_EBP(t);
 

@@ -55,6 +55,9 @@ fin:
  iret
 
 .globl task_switch; .type task_switch, @function; .align 0; task_switch:
+ pushl %ebp;
+ movl %esp,%ebp;
+
  pushl %edi; pushl %esi; pushl %ebx;
 
 
@@ -67,10 +70,13 @@ fin:
 
  popl %ebx;
 
- popl %ebx; popl %esi; popl %edi; ret
+ popl %ebx; popl %esi; popl %edi;
 
 
 
+ movl %esp, %ebp;
+ popl %ebp;
+ ret
 
 .globl ebp_value; .type ebp_value, @function; .align 0; ebp_value:
  movl %eax, %ebp
