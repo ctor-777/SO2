@@ -13,5 +13,10 @@ int __attribute__ ((__section__(".text.main")))
      /* __asm__ __volatile__ ("mov %0, %%cr3"::"r" (0) ); */
 	write(1, "\nin user...", 11);
 	while(1) { 
+		void *x = 0;
+		int a = *(int*)x;
+
+		itoa(a, buff);
+		write(1, buff, strlen(buff));
 	}
 }

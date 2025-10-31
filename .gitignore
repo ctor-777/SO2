@@ -4,4 +4,16 @@
 *.o
 *.out
 
+*.s
+
 *.bin
+
+.cache
+
+bochsout.txt
+
+system
+bootsect
+user
+build
+
