@@ -131,11 +131,6 @@ int getpid();
 
 
 
-
-
-
-
-
 FORK()
 
 sys_call_table.S:
@@ -233,10 +228,32 @@ int sys_fork()
 	PID=new_pid();
 	while(PID==pos) PID=new_pid();
 	t->PID=PID;
+	
+	void* tmp_curr = (void*)current().kernel_esp;
+        void* tmp = (void*)t.kernel_esp;
+        __asm__ __volatile__(
+                "movl %0, %%esp\n\t"
+		"addl $4, %%esp\n\t"
+		"push ret_from_fork\n\t"
+		"push 0"
+ 		:
+                : "r" (tmp)
+                : "memory"
+        );
+
+	void* tmp = (void*)t.kernel_esp;
+        __asm__ __volatile__(
+                "movl %0, %%esp\n\t"
+ 		:
+                : "r" (tmp_curr)
+                : "memory"
+        );
+
 
 	list_add_tail(t_head, &readyq);
 	return PID;
 }
+
 
 wrapper.h:
 
@@ -250,9 +267,20 @@ sched.c:
 
 int new_pid() {return last_pid++;}
 
+void ret_from_fork()
+{
+       __asm__ __volatile__(
+ 		"movl $0, 0x24(%esp)"	<------ Establecer el %eax guardado en la pila a 0 (se devuelve PID 0 para el hijo)
+        );
+
+}
+
+
 sched.h:
 
 int last_pid=1;
 int new_pid();
+void ret_from_fork();
+
 
 
