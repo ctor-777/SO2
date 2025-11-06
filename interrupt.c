@@ -81,7 +81,6 @@ void setTrapHandler(int vector, void (*handler)(), int maxAccessibleFromPL)
 
 void keyboard_service()
 {
-	printk("\nin keyboard...");
 	unsigned char c, scancode;
 	if ((c=inb(0x60)) && (c & 0x80)) {
 		scancode = c & 0x7F;
@@ -90,21 +89,12 @@ void keyboard_service()
 		else
 			c = 'C';
 
-		//task switch testing
-		//
+		//task switch testing (to be deleted)
 		char buff[16];
 		if(char_map[scancode] == 'd') {
-			// char *x = 0;
-			// *x = 1;
-			printk("\nswitching to idle... PID: ");
-			itoa((&(task[0]))->task.PID, buff);
-			printk(buff);
 			task_switch(&(task[0]));
 		} 
 		if (char_map[scancode] == 'n') {
-			printk("\nswitching to init... PID: ");
-			itoa((&(task[1]))->task.PID, buff);
-			printk(buff);
 			task_switch(&(task[1]));
 		}
 

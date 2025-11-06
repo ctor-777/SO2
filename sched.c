@@ -53,7 +53,6 @@ int allocate_DIR(struct task_struct *t)
 
 void cpu_idle(void)
 {
-	printk("\nin idle...");
 	__asm__ __volatile__("sti": : :"memory");
 
 	while(1)
@@ -72,20 +71,6 @@ void init_idle (void)
 
 	idle_task->PID = 0;
 	idle_task->kernel_esp = (DWord)&(idle_union->stack[KERNEL_STACK_SIZE-2]);
-
-	char buff[10];
-	printk("\nkernel esp idle: ");
-	itoa(idle_task->kernel_esp, buff);
-	printk(buff);
-	printk("\nmem address idle union: ");
-	itoa((int)idle_union, buff);
-	printk(buff);
-	printk("\nmem address idle stack: ");
-	itoa((int)&(idle_union->stack[KERNEL_STACK_SIZE-1]), buff);
-	printk(buff);
-	printk("\nmem address idle list: ");
-	itoa((int)&(idle_union->stack[KERNEL_STACK_SIZE-1]), buff);
-	printk(buff);
 
 	allocate_DIR(idle_task);
 
@@ -112,8 +97,6 @@ void init_task1(void)
 	set_user_pages(init_task);
 
 	set_cr3(get_DIR(init_task));
-
-	list_add_tail(&(task[1].task.anchor), &readyq);
 }
 
 
@@ -161,6 +144,4 @@ void inner_task_switch(union task_union *t) {
 		: "r" (t->task.kernel_esp)
 		: "memory"
 	);
-
-	return;
 }
