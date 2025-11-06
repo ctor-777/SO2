@@ -90,7 +90,6 @@ void keyboard_service()
 			c = 'C';
 
 		//task switch testing (to be deleted)
-		char buff[16];
 		if(char_map[scancode] == 'd') {
 			task_switch(&(task[0]));
 		} 
@@ -109,6 +108,7 @@ int zeos_ticks = 0;
 void clock_service() {
 	zeos_ticks++;
 	zeos_show_clock();
+	scheduler();
 }
 
 

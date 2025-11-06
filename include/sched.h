@@ -12,12 +12,16 @@
 #define NR_TASKS      10
 #define KERNEL_STACK_SIZE	1024
 
+extern int quantum_ticks;
+
 enum state_t { ST_RUN, ST_READY, ST_BLOCKED };
 
 struct task_struct {
 	int PID;			/* Process ID. This MUST be the first field of the struct. */
 	struct list_head anchor;	
 	DWord kernel_esp;
+	enum state_t state;
+	unsigned int quantum;
 	page_table_entry * dir_pages_baseAddr;
 };
 
@@ -57,6 +61,8 @@ void sched_next_rr();
 void update_process_state_rr(struct task_struct *t, struct list_head *dest);
 int needs_sched_rr();
 void update_sched_data_rr();
+
+void scheduler();
 
 DWord ebp_value();
 

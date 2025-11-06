@@ -71,6 +71,7 @@ void init_idle (void)
 
 	idle_task->PID = 0;
 	idle_task->kernel_esp = (DWord)&(idle_union->stack[KERNEL_STACK_SIZE-2]);
+	idle_task->quantum = 1;
 
 	allocate_DIR(idle_task);
 
@@ -91,6 +92,8 @@ void init_task1(void)
 
 	init_task->PID = 1;
 	init_task->kernel_esp = (DWord)&(init_union->stack[KERNEL_STACK_SIZE-2]);
+	init_task->quantum = 100;
+	quantum_ticks = 100;
 
 
 	allocate_DIR(init_task);
@@ -102,10 +105,8 @@ void init_task1(void)
 
 void init_sched()
 {
-
     INIT_LIST_HEAD( &readyq );
     INIT_LIST_HEAD( &freeq );
-
 
 	//fill free queue with all procesess
 	for(int i = 2; i < NR_TASKS; i++) {
@@ -125,7 +126,67 @@ struct task_struct* current()
   return (struct task_struct*)(ret_value&0xfffff000);
 }
 
+int quantum_ticks;
+
+void update_sched_data_rr() {
+	--quantum_ticks;
+}
+void sched_next_rr() {
+
+	struct task_struct* next;
+
+	if (list_empty(&readyq)) {
+		next = idle_task;
+	} else {
+		struct list_head* next_l = list_first(&readyq);
+		next = list_entry(next_l, struct task_struct, anchor);
+		update_process_state_rr(next, NULL);
+	}
+
+	char* buff[3];
+	itoa(next->PID, buff);
+	printk(buff);
+	printk("\n");
+
+	task_switch((union task_union*)next);
+}
+
+//1 if:
+//	- quantum_ticks < 0 and readyq not empty
+//	- TODO current exited
+int needs_sched_rr() {
+	if (list_empty(&readyq))
+		quantum_ticks = current()->quantum;
+
+	if (quantum_ticks < 0)
+		return 1;
+	else 
+		return 0;
+}
+
+//TODO if t exited do not add to dest
+void update_process_state_rr(struct task_struct *t, struct list_head *dest) {
+	struct list_head* t_elem = &(t->anchor);
+
+	//if t in queue -> delete it
+	if(!(t_elem->next == NULL && t_elem->prev == NULL))
+		list_del(t_elem);
+
+	//if dest not NULL -> add t to dest
+	if(dest) 
+		list_add_tail(t_elem, dest);
+}
+
 void scheduler() {
+	update_sched_data_rr();
+
+	if (needs_sched_rr()) {
+		update_process_state_rr(current(), &readyq);
+		printk("scheudled next task PID: ");
+		sched_next_rr();
+	} else {
+		printk("sheduled same task\n");
+	}
 }
 
 void inner_task_switch(union task_union *t) {
