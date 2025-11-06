@@ -94,13 +94,15 @@ void keyboard_service()
 		//
 		char buff[16];
 		if(char_map[scancode] == 'd') {
-			printk("\nswitching to idle...");
+			// char *x = 0;
+			// *x = 1;
+			printk("\nswitching to idle... PID: ");
 			itoa((&(task[0]))->task.PID, buff);
 			printk(buff);
 			task_switch(&(task[0]));
 		} 
 		if (char_map[scancode] == 'n') {
-			printk("\nswitching to init...");
+			printk("\nswitching to init... PID: ");
 			itoa((&(task[1]))->task.PID, buff);
 			printk(buff);
 			task_switch(&(task[1]));
@@ -130,14 +132,14 @@ void segmentation_fault_service(unsigned int eip, unsigned int err)
 	printk("\nProcess generates a ");
 
 	//err handling
+	if ((err >> 2) & 1)
+		printk("user ");
+	else
+		printk("system ");
+
 	if ((err >> 4) & 1)
 		printk("instruction fetch ");
 	else {
-		if ((err >> 2) & 1)
-			printk("user ");
-		else
-			printk("system ");
-
 		if ((err >> 1) & 1)
 			printk("write ");
 		else

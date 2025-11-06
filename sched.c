@@ -2,10 +2,13 @@
  * sched.c - initializes struct for task 0 anda task 1
  */
 
+#include "types.h"
 #include <sched.h>
 #include <list.h>
 #include <mm.h>
 #include <io.h>
+
+#include <libc.h>
 
 struct list_head readyq;
 struct list_head freeq;
@@ -63,39 +66,54 @@ void cpu_idle(void)
 void init_idle (void)
 {
 
-	struct list_head* idle = list_first(&freeq);
-	list_del(idle);
-	idle_task =  list_entry(idle, struct task_struct, anchor);
+	union task_union* idle_union = &(task[0]);
+	idle_task = (struct task_struct*) idle_union;
+
 
 	idle_task->PID = 0;
+	idle_task->kernel_esp = (DWord)&(idle_union->stack[KERNEL_STACK_SIZE-2]);
+
+	char buff[10];
+	printk("\nkernel esp idle: ");
+	itoa(idle_task->kernel_esp, buff);
+	printk(buff);
+	printk("\nmem address idle union: ");
+	itoa((int)idle_union, buff);
+	printk(buff);
+	printk("\nmem address idle stack: ");
+	itoa((int)&(idle_union->stack[KERNEL_STACK_SIZE-1]), buff);
+	printk(buff);
+	printk("\nmem address idle list: ");
+	itoa((int)&(idle_union->stack[KERNEL_STACK_SIZE-1]), buff);
+	printk(buff);
 
 	allocate_DIR(idle_task);
 
-	union task_union* idle_union = (union task_union*) &idle_task;
-
-	idle_union->stack[KERNEL_STACK_SIZE-1] = (unsigned int)&cpu_idle;
-	idle_union->stack[KERNEL_STACK_SIZE-2] =  0;
+	idle_union->stack[KERNEL_STACK_SIZE-1] = (unsigned long)&cpu_idle;
+	idle_union->stack[KERNEL_STACK_SIZE-2] = (unsigned long)&(idle_union->stack[KERNEL_STACK_SIZE-1]);
 
 
-	set_cr3(get_DIR(idle_task));
+	// set_cr3(get_DIR(idle_task));
 }
 
 void init_task1(void)
 {
 
-	struct list_head* init = list_first(&freeq);
-	list_del(init);
-	struct task_struct* init_task =  list_entry(init, struct task_struct, anchor);
+	union task_union* init_union = &(task[1]);
+
+	struct task_struct* init_task = (struct task_struct*)init_union;
+
 
 	init_task->PID = 1;
+	init_task->kernel_esp = (DWord)&(init_union->stack[KERNEL_STACK_SIZE-2]);
+
 
 	allocate_DIR(init_task);
 	set_user_pages(init_task);
 
-
 	set_cr3(get_DIR(init_task));
 
-	list_add_tail(init, &readyq);
+	list_add_tail(&(task[1].task.anchor), &readyq);
 }
 
 
@@ -107,7 +125,7 @@ void init_sched()
 
 
 	//fill free queue with all procesess
-	for(int i = 0; i < NR_TASKS; i++) {
+	for(int i = 2; i < NR_TASKS; i++) {
 		list_add_tail(&(task[i].task.anchor), &freeq);
 	}
 
@@ -128,19 +146,21 @@ void scheduler() {
 }
 
 void inner_task_switch(union task_union *t) {
-	
+
 	set_cr3(get_DIR(&(t->task)));
 
-	change_TSS_EBP(t);
+	tss.esp0 = t->task.kernel_esp;
 
 	current()->kernel_esp = ebp_value();
 
-	void* tmp = (void*)t->task.kernel_esp;
-	__asm__ __volatile__(
-		"movl %0, %%esp"
+	asm volatile (
+		"movl %0, %%esp\n\t"
+		"popl %%ebp\n\t"
+		"ret"
 		:
-		: "r" (tmp)
+		: "r" (t->task.kernel_esp)
 		: "memory"
 	);
-	
+
+	return;
 }

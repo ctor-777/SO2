@@ -138,10 +138,9 @@ ENTRY(task_switch)
 	popl %esi; \
 	popl %edi; \
 
-	movl %esp, %ebp; //should be redundant
 	popl %ebp;
 	ret
 
 ENTRY(ebp_value)
-	movl %eax, %ebp
+	movl %ebp, %eax
 	ret

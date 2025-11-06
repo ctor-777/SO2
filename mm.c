@@ -189,13 +189,6 @@ void setTSS()
 
   set_task_reg(KERNEL_TSS);
 }
-
-void change_TSS_EBP(union task_union *t)
-{
-  tss.esp0               = (Word)t->task.kernel_esp;
-
-  set_task_reg(KERNEL_TSS);
-}
  
 /* Initializes the ByteMap of free physical pages.
  * The kernel pages are marked as used */
