@@ -102,14 +102,20 @@ ENTRY(clock_handler)
 	iret
 	
 ENTRY(segmentation_fault_handler)
+	pushl %ebp
+	movl %esp, %ebp
+
 	SAVE_ALL
-	movl 48(%esp), %eax
+	movl 4(%ebp), %eax //err
 	pushl %eax
-	movl 44(%esp), %eax
+	movl (%ebp), %eax //eip
 	pushl %eax
 	call segmentation_fault_service
-	add   $4, %esp
+	add   $8, %esp
 	RESTORE_ALL
+
+	movl %ebp, %esp
+	popl %ebp
 	iret
 
 ENTRY(task_switch)

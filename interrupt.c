@@ -130,12 +130,30 @@ void segmentation_fault_service(unsigned int eip, unsigned int err)
 	printk("\nProcess generates a ");
 
 	//err handling
+	if ((err >> 4) & 1)
+		printk("instruction fetch ");
+	else {
+		if ((err >> 2) & 1)
+			printk("user ");
+		else
+			printk("system ");
 
-	printk("PAGE FAULT exception at EIP: ");
+		if ((err >> 1) & 1)
+			printk("write ");
+		else
+			printk("read ");
+	}
+
+	printk("(");
+	itoa(err, buff);
+	printk(buff);
+	printk(") ");
+
+	printk("PAGE FAULT exception\nEIP: ");
 	itoa(eip, buff);
 	printk(buff);
 
-	printk("   accessing: ");
+	printk("   fault address: ");
 	itoa(fault_addr, buff);
 	printk(buff);
 
