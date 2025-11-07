@@ -216,6 +216,6 @@ int new_pid() {return last_pid++;}
 void ret_from_fork()
 {
 	__asm__ __volatile__(
-		"movl $0, 0x24(%esp)"	//<------ Establecer el %eax guardado en la pila a 0 (se devuelve PID 0 para el hijo)
+		"movl $0, 0x1c(%esp)"	//<------ Establecer el %eax guardado en la pila a 0 (se devuelve PID 0 para el hijo)
 	);
 }

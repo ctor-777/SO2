@@ -1,5 +1,9 @@
+#include "list.h"
 #include <utils.h>
 #include <types.h>
+#include <sched.h>
+#include <io.h>
+#include <libc.h>
 
 #include <mm_address.h>
 
@@ -85,6 +89,89 @@ int access_ok(int type, const void * addr, unsigned long size)
   return 0;
 }
 
+void itoa_hex(int a, char* b) {
+		int i, i1;
+		char c;
+		char hex[17] = "0123456789ABCDEF";
+		
+		
+		if (a==0) { b[0]='0'; b[1]=0; return ;}
+		
+		i=0;
+		while (a>0)
+		{
+				b[i]=hex[a%16];
+				a=a/16;
+				i++;
+		}
+		
+		for (i1=0; i1<i/2; i1++)
+		{
+				c=b[i1];
+				b[i1]=b[i-i1-1];
+				b[i-i1-1]=c;
+		}
+		b[i]=0;
+}
+
+void print_stack(union task_union* t_u) {
+	unsigned long * stack_base = (unsigned long *)&(t_u->stack[KERNEL_STACK_SIZE - 1]);
+	unsigned long * stack_top = (unsigned long *)t_u->task.kernel_esp;
+	 
+	if (t_u == (union task_union*) current()) {
+		__asm__ __inline__ (
+			"movl %%esp, %0"
+			: "=a"(stack_top)
+			: 
+			:
+			);
+	}
+
+	int i = (stack_base - stack_top);
+	int aux = 50;
+
+	char buff[9];
+
+	if (stack_top > stack_base)
+		return;
+	while(i > 0 && aux > 0) {
+		printk("\n");
+		itoa(i, buff);
+		printk(buff);
+		itoa_hex((int)stack_base, buff);
+		printk(" (");
+		printk(buff);
+		printk(")");
+		printk(": [");
+		itoa_hex(*stack_base, buff);
+		printk(buff);
+		printk("]");
+
+		stack_base--;
+		i--;
+		aux--;
+	}
+}
+
+void print_queue(struct list_head* head) {
+	struct list_head* pos;
+	struct task_struct* pos_task_s;
+
+	char buff[9];
+	list_for_each(pos, head) {
+		pos_task_s = list_entry(pos, struct task_struct, anchor);
+
+		int pos_task = ((int)pos_task_s-(int)task)/sizeof(union task_union);	
+		
+		itoa(pos_task, buff);
+		printk("\n");
+		printk(buff);
+		printk(": PID ");
+
+		itoa(pos_task_s->PID, buff);
+		printk(buff);
+	}
+}
 
 #define CYCLESPERTICK 109000
 

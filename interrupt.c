@@ -12,6 +12,7 @@
 #include <syscall.h>
 #include <page_fault.h>
 #include <libc.h>
+#include <utils.h>
 
 #include <zeos_interrupt.h>
 
@@ -141,13 +142,21 @@ void segmentation_fault_service(unsigned int eip, unsigned int err)
 	printk(buff);
 	printk(") ");
 
-	printk("PAGE FAULT exception\nEIP: ");
-	itoa(eip, buff);
+	printk("PAGE FAULT exception\nEIP: 0x");
+	itoa_hex(eip, buff);
 	printk(buff);
-
-	printk("   fault address: ");
-	itoa(fault_addr, buff);
+	// printk(" (");
+	// itoa(eip, buff);
+	// printk(buff);
+	// printk(")");
+	
+	printk("   fault address: 0x");
+	itoa_hex(fault_addr, buff);
 	printk(buff);
+	// printk(" (");
+	// itoa(fault_addr, buff);
+	// printk(buff);
+	// printk(")");
 
 	while (1);
 }

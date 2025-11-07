@@ -75,18 +75,18 @@ int sys_fork()
 	if(list_empty(&freeq)) 
 		return PID;
 
-	struct list_head* t_head = list_first(&freeq);
-	list_del(t_head);
+	struct list_head* new_h = list_first(&freeq);
+	list_del(new_h);
 
-	struct task_struct* t = list_entry(t_head, struct task_struct, anchor);
+	struct task_struct* new_s = list_entry(new_h, struct task_struct, anchor);
+	union task_union* new_u = (union task_union*)new_s;
 
-	// union task_union* t_union;
-	copy_data(current(), t, 4096);
-	allocate_DIR(t);
+	copy_data(current(), new_s, 4096);
+	allocate_DIR(new_s);
 
 	int pag;
 	int new_ph_pag;
-	page_table_entry * process_PT_new =  get_PT(t);
+	page_table_entry * process_PT_new =  get_PT(new_s);
 	page_table_entry * process_PT_current =  get_PT(current());
 
 	//NO USAMOS set_user_pages PORQUE EN LAS INSTRUCCIONES NOS PIDEN USAR ALLOC_FRAME() 
@@ -99,7 +99,7 @@ int sys_fork()
 	}
 
 	/* DATA */
-	unsigned temp_pag = 0xA00000 >> 12;	//<------------ Necesitamos una pagina temporal para copiar los datos del proceso 1 al 2 (como las 20 paginas de data van antes
+	unsigned temp_pag = 0x3FF000 >> 12;	//<------------ Necesitamos una pagina temporal para copiar los datos del proceso 1 al 2 (como las 20 paginas de data van antes
 	for (pag=0;pag<NUM_PAG_DATA;pag++){		 // que las paginas de code, si usabamos una pagina numero 21 de data, reescribiriamos una pagina de code(dir valida?)
 		new_ph_pag=alloc_frame();
 		if(new_ph_pag==-1) {				   //<------------ Devuelve error si no ha podido reservar la pagina
@@ -116,37 +116,29 @@ int sys_fork()
 		process_PT_new[PAG_LOG_INIT_DATA+pag].bits.present = 1;
 		
 		set_ss_pag(process_PT_current, temp_pag, new_ph_pag);
-		copy_data((void*)temp_pag,(void*)new_ph_pag,4096);
+		// set_cr3(get_DIR(current()));
+		copy_data((void*)((PAG_LOG_INIT_DATA + pag) << 12),(void*)(temp_pag << 12),4096);
 		del_ss_pag(process_PT_current, temp_pag);
 	}
 
 	//PID
 	int pos;
-	pos = ((int)t-(int)task)/sizeof(union task_union);
+	pos = ((int)new_s-(int)task)/sizeof(union task_union);
 	PID=new_pid();
 	while(PID==pos) PID=new_pid();
-	t->PID=PID;
+	new_s->PID=PID;
 	
-	void* curr_sys_esp = (void*)current()->kernel_esp;
-	void* new_sys_esp = (void*)t->kernel_esp;
+	// void* curr_sys_ebp = (void*)current()->kernel_esp;
+	unsigned long* curr_sys_ebp = (void *)ebp_value();
+	int ebp_diff = (&( (union task_union*)current() )->stack[KERNEL_STACK_SIZE-1]) - (curr_sys_ebp - 1);
 
-	__asm__ __volatile__(
-		"movl %0, %%esp\n\t"
-		"addl $4, %%esp\n\t"
-		"push ret_from_fork\n\t"
-		"push 0"
-		:
-		: "r" (new_sys_esp)
-		: "memory"
-	);
+	new_s->kernel_esp = (DWord)(( &( new_u )->stack[KERNEL_STACK_SIZE-1] ) - ebp_diff - 1);
 
-	__asm__ __volatile__(
-		"movl %0, %%esp\n\t"
-		:
-		: "r" (curr_sys_esp)
-		: "memory"
-	);
+	new_u->stack[KERNEL_STACK_SIZE - ebp_diff] = (unsigned long)&ret_from_fork;
 
-	list_add_tail(t_head, &readyq);
+	new_u->stack[KERNEL_STACK_SIZE - ebp_diff - 1] = (unsigned long)0;
+
+	list_add_tail(new_h, &readyq);
 	return PID;
 }
+
