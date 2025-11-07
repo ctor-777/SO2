@@ -142,3 +142,68 @@ int sys_fork()
 	return PID;
 }
 
+
+void sys_exit()
+{
+	struct task_struct *t = current();
+	struct list_head *pos, *n;
+	struct task_struct *tmp;
+	if(t->parent != NULL) list_del(t->child_anchor);
+ 	list_for_each_safe(pos, n, t->childs)
+ 	{
+ 		tmp= list_entry(pos, struct task_struct, child_anchor);
+		tmp->parent=idle_task;
+		list_del(pos);
+		list_add_tail(pos, idle_task->childs);
+ 	}
+
+
+	free_user_pages(t);
+	list_add_tail(t->anchor, &freeq);
+	sched_next_rr();
+}
+
+
+void sys_block()
+{
+	task task_struct* t= current();
+	if(t->pending_unblocks) t->pending_unblocks--;
+	else
+	{
+ 		list_add_tail(t->anchor, &blocked);
+ 		sched_next_rr();
+	}
+}
+
+int sys_unblock(int pid)
+{
+	struct list_head *pos;
+	struct task_struct *tmp;
+	struct task_struct *child=NULL;
+
+	list_for_each(pos, current()->childs)
+	{
+		tmp= list_entry(pos, struct task_struct, child_anchor);
+		if(tmp->PID==pid)
+		{
+			child=tmp;
+			break;
+		}
+	}
+	if(child==NULL) return -1;
+	
+	int trobat=0;
+	list_for_each(pos, &blocked)
+	{
+ 		if(child->anchor==pos) trobat=1;
+		
+	}
+	if(!trobat) child->pending_unblock++;
+	else
+	{
+		list_del(child->anchor);
+		list_add_tail(child->anchor, &readyq);
+	}
+	return 0;
+}
+
