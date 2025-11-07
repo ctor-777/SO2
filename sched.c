@@ -184,10 +184,10 @@ void scheduler() {
 
 	if (needs_sched_rr()) {
 		update_process_state_rr(current(), &readyq);
-		printk("scheudled next task PID: ");
+		printk("\nscheudled next task PID: ");
 		sched_next_rr();
 	} else {
-		printk("sheduled same task\n");
+		// printk("\nsheduled same task\n");
 	}
 }
 
@@ -211,11 +211,14 @@ void inner_task_switch(union task_union *t) {
 
 int last_pid = 1;
 
-int new_pid() {return last_pid++;}
+int new_pid() {
+	last_pid++;
+	return last_pid;
+}
 
 void ret_from_fork()
 {
 	__asm__ __volatile__(
-		"movl $0, 0x1c(%esp)"	//<------ Establecer el %eax guardado en la pila a 0 (se devuelve PID 0 para el hijo)
+		"movl $0, %eax"
 	);
 }

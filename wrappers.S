@@ -1,9 +1,10 @@
 #include <asm.h>
 
 ENTRY(write)
-	movl 4(%esp), %edx	//fd
-	movl 8(%esp), %ecx	//buffer
-	movl 12(%esp), %ebx	//size
+	pushl %ebx
+	movl 8(%esp), %edx	//fd
+	movl 12(%esp), %ecx	//buffer
+	movl 16(%esp), %ebx	//size
 	movl $4, %eax		//sys_call_table entry for write is 4
 	int $0x80
 	cmpl $0, %eax
@@ -12,6 +13,7 @@ ENTRY(write)
 	movl %eax, errno
 	movl $-1, %eax
 exit_wr:
+	popl %ebx
 	ret
 
 ENTRY(gettime)

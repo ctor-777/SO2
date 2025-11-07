@@ -116,10 +116,13 @@ int sys_fork()
 		process_PT_new[PAG_LOG_INIT_DATA+pag].bits.present = 1;
 		
 		set_ss_pag(process_PT_current, temp_pag, new_ph_pag);
-		// set_cr3(get_DIR(current()));
 		copy_data((void*)((PAG_LOG_INIT_DATA + pag) << 12),(void*)(temp_pag << 12),4096);
 		del_ss_pag(process_PT_current, temp_pag);
+		set_cr3(get_DIR(current())); //TODO optimize this
 	}
+
+
+	set_cr3(get_DIR(current()));
 
 	//PID
 	int pos;
@@ -132,7 +135,7 @@ int sys_fork()
 	unsigned long* curr_sys_ebp = (void *)ebp_value();
 	int ebp_diff = (&( (union task_union*)current() )->stack[KERNEL_STACK_SIZE-1]) - (curr_sys_ebp - 1);
 
-	new_s->kernel_esp = (DWord)(( &( new_u )->stack[KERNEL_STACK_SIZE-1] ) - ebp_diff - 1);
+	new_s->kernel_esp = (DWord)(( &( new_u )->stack[KERNEL_STACK_SIZE-1] ) - ebp_diff);
 
 	new_u->stack[KERNEL_STACK_SIZE - ebp_diff] = (unsigned long)&ret_from_fork;
 
