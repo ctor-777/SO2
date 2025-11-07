@@ -9,4 +9,11 @@ int sys_getpid();
 
 int sys_fork();
 
+void sys_exit();
+
+void sys_block();
+
+int sys_unblock(int pid);
+
+
 #endif /* __SYS_H__ */
