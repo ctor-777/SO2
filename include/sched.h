@@ -26,6 +26,10 @@ struct task_struct {
 	enum state_t state;
 	unsigned int quantum;
 	page_table_entry * dir_pages_baseAddr;
+	struct task_struct parent*		//Puntero al padre
+	struct list_head child_anchor;		//list_head para la lista de hijos del padre
+	struct list_head childs;		//Lista de hijos de este proceso
+	int pending_unblocks;
 };
 
 union task_union {
