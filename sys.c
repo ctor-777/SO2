@@ -119,7 +119,6 @@ int sys_fork()
 		set_cr3(get_DIR(current())); //TODO optimize this
 	}
 
-
 	set_cr3(get_DIR(current()));
 
 	//PID
@@ -202,9 +201,12 @@ int sys_unblock(int pid)
 	int trobat=0;
 	list_for_each(pos, &blocked)
 	{
-		if(&(child->anchor) == pos) trobat=1;
+		if(&(child->anchor)==pos) 
+		{
+			trobat=1;
+			break;
+		}
 	}
-
 	if(!trobat) child->pending_unblocks++;
 	else
 	{
