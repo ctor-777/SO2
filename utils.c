@@ -116,7 +116,7 @@ void itoa_hex(int a, char* b) {
 
 void print_stack(union task_union* t_u) {
 	unsigned long * stack_base = (unsigned long *)&(t_u->stack[KERNEL_STACK_SIZE - 1]);
-	unsigned long * stack_top = (unsigned long *)t_u->task.kernel_esp;
+	unsigned long * stack_top = (unsigned long *)t_u->task.kernel_esp - 1;
 	 
 	if (t_u == (union task_union*) current()) {
 		__asm__ __inline__ (

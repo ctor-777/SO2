@@ -97,6 +97,9 @@ void keyboard_service()
 		if (char_map[scancode] == 'n') {
 			task_switch(&(task[1]));
 		}
+		if (char_map[scancode] == 'c') {
+			task_switch(&(task[2]));
+		}
 
 		printc_xy(0, 0, c);
 	}

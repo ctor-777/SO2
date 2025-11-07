@@ -108,7 +108,7 @@ ENTRY(segmentation_fault_handler)
 	SAVE_ALL
 	movl 4(%ebp), %eax //err
 	pushl %eax
-	movl (%ebp), %eax //eip
+	movl 0(%ebp), %eax //eip
 	pushl %eax
 	call segmentation_fault_service
 	add   $8, %esp
