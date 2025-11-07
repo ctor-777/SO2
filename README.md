@@ -46,7 +46,7 @@ exit:
 
 wrappers.h:
 
-int exit();
+void exit();
 
 
 
