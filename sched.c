@@ -12,6 +12,7 @@
 
 struct list_head readyq;
 struct list_head freeq;
+
 struct task_struct* idle_task;
 
 union task_union task[NR_TASKS]
@@ -37,6 +38,7 @@ page_table_entry * get_DIR (struct task_struct *t)
 page_table_entry * get_PT (struct task_struct *t) 
 {
 	return (page_table_entry *)(((unsigned int)(t->dir_pages_baseAddr->bits.pbase_addr))<<12);
+	
 }
 
 
@@ -143,7 +145,7 @@ void sched_next_rr() {
 		update_process_state_rr(next, NULL);
 	}
 
-	char* buff[3];
+	char buff[3];
 	itoa(next->PID, buff);
 	printk(buff);
 	printk("\n");
@@ -204,5 +206,16 @@ void inner_task_switch(union task_union *t) {
 		:
 		: "r" (t->task.kernel_esp)
 		: "memory"
+	);
+}
+
+int last_pid = 1;
+
+int new_pid() {return last_pid++;}
+
+void ret_from_fork()
+{
+	__asm__ __volatile__(
+		"movl $0, 0x24(%esp)"	//<------ Establecer el %eax guardado en la pila a 0 (se devuelve PID 0 para el hijo)
 	);
 }

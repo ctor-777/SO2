@@ -6,5 +6,9 @@ int write (int fd, char * buffer, int size);
 
 int gettime();
 
+int getpid();
+
+int fork();
+
 #endif /* __WRAPPERS_H__ */
 

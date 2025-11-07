@@ -14,6 +14,9 @@
 
 extern int quantum_ticks;
 
+extern struct list_head readyq;
+extern struct list_head freeq;
+
 enum state_t { ST_RUN, ST_READY, ST_BLOCKED };
 
 struct task_struct {
@@ -46,8 +49,6 @@ void init_sched(void);
 
 struct task_struct * current();
 
-void task_switch(union task_union*t);
-
 struct task_struct *list_head_to_task_struct(struct list_head *l);
 
 int allocate_DIR(struct task_struct *t);
@@ -55,6 +56,10 @@ int allocate_DIR(struct task_struct *t);
 page_table_entry * get_PT (struct task_struct *t) ;
 
 page_table_entry * get_DIR (struct task_struct *t) ;
+
+//context switch
+void task_switch(union task_union*t);
+DWord ebp_value();
 
 /* Headers for the scheduling policy */
 void sched_next_rr();
@@ -64,6 +69,10 @@ void update_sched_data_rr();
 
 void scheduler();
 
-DWord ebp_value();
+//fork and getpid
+extern int last_pid;
+
+int new_pid();
+void ret_from_fork();
 
 #endif  /* __SCHED_H__ */
