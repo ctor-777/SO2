@@ -45,36 +45,36 @@ exit_fork:
 	ret
 
 ENTRY(exit)
-  	movl $1, %eax           //sys_call_table entry for exit is 1
-   	int $0x80
-   	cmpl $0, %eax
-   	jge exit_exit
-   	neg %eax
-   	movl %eax, errno
-   	movl $-1, %eax
+	movl $1, %eax           //sys_call_table entry for exit is 1
+	int $0x80
+	cmpl $0, %eax
+	jge exit_exit
+	neg %eax
+	movl %eax, errno
+	movl $-1, %eax
 exit_exit:
-  	ret
+	ret
 
 
 ENTRY(block)
 	movl $5, %eax           //sys_call_table entry for block is 5
 	int $0x80
-  	cmpl $0, %eax
- 	jge exit_block
-   	neg %eax
-   	movl %eax, errno
-   	movl $-1, %eax
+	cmpl $0, %eax
+	jge exit_block
+	neg %eax
+	movl %eax, errno
+	movl $-1, %eax
 exit_block:
- 	ret
+	ret
 
 ENTRY(unblock)
 	movl 4(%esp), %ebx     //pid
-    movl $6, %eax           //sys_call_table entry for unblock is 6
-   	int $0x80
-   	cmpl $0, %eax
-   	jge exit_unblock
-   	neg %eax
-   	movl %eax, errno
-   	movl $-1, %eax
+	movl $6, %eax           //sys_call_table entry for unblock is 6
+	int $0x80
+	cmpl $0, %eax
+	jge exit_unblock
+	neg %eax
+	movl %eax, errno
+	movl $-1, %eax
 exit_unblock:
-   	ret
+	ret

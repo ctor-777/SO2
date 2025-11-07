@@ -25,9 +25,6 @@ struct task_struct *list_head_to_task_struct(struct list_head *l)
 }
 #endif
 
-extern struct list_head blocked;
-
-
 /* get_DIR - Returns the Page Directory address for task 't' */
 page_table_entry * get_DIR (struct task_struct *t) 
 {
@@ -75,6 +72,8 @@ void init_idle (void)
 	idle_task->kernel_esp = (DWord)&(idle_union->stack[KERNEL_STACK_SIZE-2]);
 	idle_task->quantum = 1;
 
+    INIT_LIST_HEAD( &(idle_task->childs) );
+
 	allocate_DIR(idle_task);
 
 	idle_union->stack[KERNEL_STACK_SIZE-1] = (unsigned long)&cpu_idle;
@@ -96,6 +95,9 @@ void init_task1(void)
 	init_task->kernel_esp = (DWord)&(init_union->stack[KERNEL_STACK_SIZE-2]);
 	init_task->quantum = 100;
 	quantum_ticks = 100;
+
+    INIT_LIST_HEAD( &(init_task->childs) );
+
 
 
 	allocate_DIR(init_task);
