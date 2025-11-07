@@ -166,7 +166,7 @@ void sys_exit()
 
 void sys_block()
 {
-	task task_struct* t= current();
+	struct task_struct* t= current();
 	if(t->pending_unblocks) t->pending_unblocks--;
 	else
 	{
@@ -195,10 +195,13 @@ int sys_unblock(int pid)
 	int trobat=0;
 	list_for_each(pos, &blocked)
 	{
- 		if(child->anchor==pos) trobat=1;
-		
+ 		if(child->anchor==pos) 
+		{
+			trobat=1;
+			break;
+		}
 	}
-	if(!trobat) child->pending_unblock++;
+	if(!trobat) child->pending_unblocks++;
 	else
 	{
 		list_del(child->anchor);
