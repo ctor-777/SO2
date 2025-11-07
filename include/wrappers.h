@@ -10,5 +10,12 @@ int getpid();
 
 int fork();
 
+void exit();
+
+void block();
+
+int unblock(int pid);
+
+
 #endif /* __WRAPPERS_H__ */
 
