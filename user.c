@@ -23,8 +23,11 @@ int __attribute__ ((__section__(".text.main")))
 		write(1, "\nfailed fork", 12);
 	}
 
+	// for(int i = 0; i < 10000; i++) {
 	while(1) { 
-		write(1, "\n", 1);
-		write(1, buff, 1);
+		// write(1, "\n                                  ", 1);
+		// write(1, buff, 1);
 	}
+
+	exit();
 }

@@ -66,7 +66,9 @@ page_table_entry * get_DIR (struct task_struct *t) ;
 
 //context switch
 void task_switch(union task_union*t);
+
 DWord ebp_value();
+DWord esp_value();
 
 /* Headers for the scheduling policy */
 void sched_next_rr();

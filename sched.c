@@ -7,6 +7,7 @@
 #include <list.h>
 #include <mm.h>
 #include <io.h>
+#include <utils.h>
 
 #include <libc.h>
 
@@ -181,8 +182,47 @@ void update_process_state_rr(struct task_struct *t, struct list_head *dest) {
 		list_add_tail(t_elem, dest);
 }
 
+void overflow_breakpoint() {
+	printk("\nstack overflow at PID: ");
+	char buff[4];
+	itoa(current()->PID, buff);
+	printk(buff);
+	printk("                                      ");
+	return;
+}
+
+void debug_stack() {
+	DWord* esp = (DWord *)esp_value();
+	DWord* base = (DWord*)&(((union task_union *)current())->stack[KERNEL_STACK_SIZE - 1]);
+	char buff[8];
+
+	printk("\nesp value at PID(");
+
+	itoa(current()->PID, buff);
+	printk(buff);
+
+	printk("): ");
+	itoa_hex((int)esp, buff);
+	printk(buff);
+
+	printk("    system stack size: ");
+	itoa(base-esp, buff);
+	printk(buff);
+	
+	DWord* stack_overflow_addr = (DWord*)((void*)current() + ((sizeof(struct task_struct) * 5)));
+	
+	printk("    overflow_addr: ");
+	itoa_hex((int)stack_overflow_addr, buff);
+	printk(buff);
+
+	if (esp <= stack_overflow_addr)
+		overflow_breakpoint();
+
+}
+
 void scheduler() {
 	update_sched_data_rr();
+	// debug_stack();
 
 	if (needs_sched_rr()) {
 		update_process_state_rr(current(), &readyq);
@@ -197,7 +237,7 @@ void inner_task_switch(union task_union *t) {
 
 	set_cr3(get_DIR(&(t->task)));
 
-	tss.esp0 = t->task.kernel_esp;
+	tss.esp0 = (DWord)&(t->stack[KERNEL_STACK_SIZE - 1]);
 
 	current()->kernel_esp = ebp_value();
 

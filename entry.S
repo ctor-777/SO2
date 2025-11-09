@@ -144,3 +144,7 @@ ENTRY(task_switch)
 ENTRY(ebp_value)
 	movl %ebp, %eax
 	ret
+
+ENTRY(esp_value)
+	movl %esp, %eax
+	ret
