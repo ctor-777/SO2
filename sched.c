@@ -112,6 +112,7 @@ void init_sched()
 {
     INIT_LIST_HEAD( &readyq );
     INIT_LIST_HEAD( &freeq );
+    INIT_LIST_HEAD( &blocked );
 
 	//fill free queue with all procesess
 	for(int i = 2; i < NR_TASKS; i++) {

@@ -1,7 +1,6 @@
 /*
  * sys.c - Syscalls implementation
  */
-#include "list.h"
 #include <libc.h>
 #include <devices.h>
 
